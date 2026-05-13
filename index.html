@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Word Finder</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f4f4f6;
+      color: #222;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 1.5rem;
+      color: #1a1a2e;
+    }
+
+    .controls {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      max-width: 800px;
+    }
+
+    .field label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #666;
+      margin-bottom: .4rem;
+    }
+
+    #letters-input {
+      font-size: 1.1rem;
+      padding: .45rem .7rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 320px;
+      outline: none;
+      transition: border-color .15s;
+    }
+    #letters-input:focus { border-color: #6366f1; }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    #length-slider {
+      flex: 1;
+      max-width: 280px;
+      accent-color: #6366f1;
+      cursor: pointer;
+    }
+
+    #length-display {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #6366f1;
+      min-width: 2ch;
+      text-align: center;
+    }
+
+    #position-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .35rem;
+    }
+
+    .pos-input {
+      width: 2.2rem;
+      height: 2.4rem;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      outline: none;
+      text-transform: lowercase;
+      transition: border-color .15s, background .15s;
+      background: #fafafa;
+    }
+    .pos-input:focus { border-color: #6366f1; background: #f0f0ff; }
+    .pos-input.filled { border-color: #6366f1; background: #ede9fe; color: #4338ca; }
+
+    .pos-index {
+      width: 2.2rem;
+      text-align: center;
+      font-size: .65rem;
+      color: #aaa;
+      margin-top: .15rem;
+    }
+
+    .pos-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #status {
+      font-size: .85rem;
+      color: #888;
+      min-height: 1.2em;
+    }
+
+    #results {
+      margin-top: 1.5rem;
+      max-width: 800px;
+    }
+
+    #results-count {
+      font-size: .85rem;
+      color: #888;
+      margin-bottom: .75rem;
+    }
+
+    #words-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+    }
+
+    .word-tag {
+      background: #fff;
+      border: 1px solid #e0e0e8;
+      border-radius: 6px;
+      padding: .25rem .6rem;
+      font-size: .95rem;
+      font-family: 'Courier New', monospace;
+      color: #333;
+      transition: background .1s;
+    }
+    .word-tag:hover { background: #ede9fe; border-color: #a5b4fc; }
+  </style>
+</head>
+<body>
+  <h1>Word Finder</h1>
+
+  <div class="controls">
+    <div class="field">
+      <label for="letters-input">Available letters</label>
+      <input id="letters-input" type="text" placeholder="e.g. tceurrn" autocomplete="off" spellcheck="false">
+    </div>
+
+    <div class="field">
+      <label>Word length</label>
+      <div class="slider-row">
+        <input id="length-slider" type="range" min="1" max="30" value="7">
+        <span id="length-display">7</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Position filter <span style="font-weight:400;text-transform:none;letter-spacing:0">(leave blank to match any)</span></label>
+      <div id="position-filters"></div>
+    </div>
+
+    <div id="status">Loading word list…</div>
+  </div>
+
+  <div id="results">
+    <div id="results-count"></div>
+    <div id="words-container"></div>
+  </div>
+
+  <script>
+    const MAX_DISPLAY = 500;
+
+    let allWords = [];
+    let ready = false;
+
+    const lettersInput  = document.getElementById('letters-input');
+    const lengthSlider  = document.getElementById('length-slider');
+    const lengthDisplay = document.getElementById('length-display');
+    const posFilters    = document.getElementById('position-filters');
+    const statusEl      = document.getElementById('status');
+    const countEl       = document.getElementById('results-count');
+    const wordsEl       = document.getElementById('words-container');
+
+    // ── Load word list ──────────────────────────────────────────────
+    fetch('words_alpha.txt')
+      .then(r => r.text())
+      .then(text => {
+        allWords = text.split('\n').map(w => w.trim()).filter(Boolean);
+        ready = true;
+        statusEl.textContent = `${allWords.length.toLocaleString()} words loaded`;
+        buildPositionInputs(+lengthSlider.value);
+        runFilter();
+      })
+      .catch(() => {
+        statusEl.textContent = 'Failed to load words_alpha.txt – serve this file from the same directory.';
+      });
+
+    // ── Position inputs ─────────────────────────────────────────────
+    function buildPositionInputs(n) {
+      const prev = [...posFilters.querySelectorAll('.pos-input')].map(el => el.value);
+      posFilters.innerHTML = '';
+      for (let i = 0; i < n; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'pos-cell';
+
+        const inp = document.createElement('input');
+        inp.type = 'text';
+        inp.maxLength = 1;
+        inp.className = 'pos-input';
+        inp.dataset.index = i;
+        inp.value = prev[i] || '';
+        if (inp.value) inp.classList.add('filled');
+
+        inp.addEventListener('input', () => {
+          inp.value = inp.value.toLowerCase().replace(/[^a-z]/g, '').slice(-1);
+          inp.classList.toggle('filled', inp.value !== '');
+          runFilter();
+          // auto-advance
+          if (inp.value) {
+            const next = posFilters.querySelector(`.pos-input[data-index="${i + 1}"]`);
+            if (next) next.focus();
+          }
+        });
+
+        inp.addEventListener('keydown', e => {
+          if (e.key === 'Backspace' && inp.value === '') {
+            const prev = posFilters.querySelector(`.pos-input[data-index="${i - 1}"]`);
+            if (prev) { prev.focus(); prev.value = ''; prev.classList.remove('filled'); runFilter(); }
+          } else if (e.key === 'ArrowLeft') {
+            const p = posFilters.querySelector(`.pos-input[data-index="${i - 1}"]`);
+            if (p) p.focus();
+          } else if (e.key === 'ArrowRight') {
+            const nx = posFilters.querySelector(`.pos-input[data-index="${i + 1}"]`);
+            if (nx) nx.focus();
+          }
+        });
+
+        const idx = document.createElement('div');
+        idx.className = 'pos-index';
+        idx.textContent = i + 1;
+
+        cell.append(inp, idx);
+        posFilters.append(cell);
+      }
+    }
+
+    // ── Filter logic ────────────────────────────────────────────────
+    function letterCounts(str) {
+      const c = {};
+      for (const ch of str) c[ch] = (c[ch] || 0) + 1;
+      return c;
+    }
+
+    function fitsInBag(word, bag) {
+      const wc = letterCounts(word);
+      for (const ch of Object.keys(wc)) {
+        if ((wc[ch] || 0) > (bag[ch] || 0)) return false;
+      }
+      return true;
+    }
+
+    function runFilter() {
+      if (!ready) return;
+
+      const length   = +lengthSlider.value;
+      const rawLetters = lettersInput.value.trim().toLowerCase().replace(/[^a-z]/g, '');
+      const bag      = rawLetters ? letterCounts(rawLetters) : null;
+      const pattern  = [...posFilters.querySelectorAll('.pos-input')].map(el => el.value.toLowerCase());
+
+      const matched = [];
+      for (const word of allWords) {
+        if (word.length !== length) continue;
+        // position filter
+        let ok = true;
+        for (let i = 0; i < pattern.length; i++) {
+          if (pattern[i] && word[i] !== pattern[i]) { ok = false; break; }
+        }
+        if (!ok) continue;
+        // bag filter (only when letters provided)
+        if (bag && !fitsInBag(word, bag)) continue;
+        matched.push(word);
+      }
+
+      const total = matched.length;
+      countEl.textContent = total === 0
+        ? 'No matches'
+        : `${total.toLocaleString()} match${total === 1 ? '' : 'es'}${total > MAX_DISPLAY ? ` — showing first ${MAX_DISPLAY}` : ''}`;
+
+      wordsEl.innerHTML = '';
+      const frag = document.createDocumentFragment();
+      for (const w of matched.slice(0, MAX_DISPLAY)) {
+        const span = document.createElement('span');
+        span.className = 'word-tag';
+        span.textContent = w;
+        frag.append(span);
+      }
+      wordsEl.append(frag);
+    }
+
+    // ── Event wiring ────────────────────────────────────────────────
+    lengthSlider.addEventListener('input', () => {
+      const n = +lengthSlider.value;
+      lengthDisplay.textContent = n;
+      buildPositionInputs(n);
+      runFilter();
+    });
+
+    lettersInput.addEventListener('input', runFilter);
+  </script>
+</body>
+</html>
