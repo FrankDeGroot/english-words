@@ -415,10 +415,17 @@
     function runFilter() {
       if (!ready) return;
 
-      const length   = +lengthSlider.value;
+      const length     = +lengthSlider.value;
       const rawLetters = lettersInput.value.trim().toLowerCase().replace(/[^a-z]/g, '');
-      const bag      = rawLetters ? letterCounts(rawLetters) : null;
-      const pattern  = [...posFilters.querySelectorAll('.pos-input')].map(el => el.value.toLowerCase());
+      const bag        = rawLetters ? letterCounts(rawLetters) : null;
+      const pattern    = [...posFilters.querySelectorAll('.pos-input')].map(el => el.value.toLowerCase());
+
+      if (!rawLetters) {
+        statusEl.textContent = `${allWords.length.toLocaleString()} words loaded`;
+        countEl.textContent = '';
+        wordsEl.innerHTML = '';
+        return;
+      }
 
       const matched = [];
       for (const word of allWords) {
