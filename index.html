@@ -261,14 +261,14 @@
   <div class="controls">
     <div class="field">
       <label for="letters-input">Available letters</label>
-      <input id="letters-input" type="text" placeholder="e.g. tceurrn" autocomplete="off" spellcheck="false">
+      <input id="letters-input" type="text" placeholder="e.g. wordtrails" autocomplete="off" spellcheck="false">
     </div>
 
     <div class="field">
       <label>Word length</label>
       <div class="slider-row">
-        <input id="length-slider" type="range" min="1" max="30" value="7">
-        <span id="length-display">7</span>
+        <input id="length-slider" type="range" min="3" max="30" value="10">
+        <span id="length-display">10</span>
       </div>
     </div>
 
@@ -335,7 +335,7 @@
     const wordsEl       = document.getElementById('words-container');
 
     // ── Load word list ──────────────────────────────────────────────
-    fetch('words_alpha.txt')
+    fetch('word_trails.txt')
       .then(r => r.text())
       .then(text => {
         allWords = text.split('\n').map(w => w.trim()).filter(Boolean);
@@ -345,7 +345,7 @@
         runFilter();
       })
       .catch(() => {
-        statusEl.textContent = 'Failed to load words_alpha.txt – serve this file from the same directory.';
+        statusEl.textContent = 'Failed to load word_trails.txt – serve this file from the same directory.';
       });
 
     // ── Position inputs ─────────────────────────────────────────────
