@@ -267,8 +267,8 @@
     <div class="field">
       <label>Word length</label>
       <div class="slider-row">
-        <input id="length-slider" type="range" min="3" max="30" value="10">
-        <span id="length-display">10</span>
+        <input id="length-slider" type="range" min="3" max="30" value="3">
+        <span id="length-display">3</span>
       </div>
     </div>
 
@@ -363,6 +363,7 @@
         inp.value = prev[i] || '';
         if (inp.value) inp.classList.add('filled');
 
+        inp.addEventListener('focus', () => inp.select());
         inp.addEventListener('input', () => {
           inp.value = inp.value.toLowerCase().replace(/[^a-z]/g, '').slice(-1);
           inp.classList.toggle('filled', inp.value !== '');
@@ -463,9 +464,9 @@
       const letterCount = rawLetters.length;
 
       if (letterCount > 0) {
-        lengthSlider.max = letterCount;
-        lengthSlider.value = letterCount;
-        lengthDisplay.textContent = letterCount;
+        lengthSlider.max = Math.max(letterCount, 3);
+        lengthSlider.value = 3;
+        lengthDisplay.textContent = 3;
       } else {
         lengthSlider.max = 30;
       }
