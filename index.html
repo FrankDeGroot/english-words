@@ -340,7 +340,6 @@
       .then(text => {
         allWords = text.split('\n').map(w => w.trim()).filter(Boolean);
         ready = true;
-        statusEl.textContent = `${allWords.length.toLocaleString()} words loaded`;
         buildPositionInputs(+lengthSlider.value);
         runFilter();
       })
@@ -435,9 +434,10 @@
       }
 
       const total = matched.length;
-      countEl.textContent = total === 0
+      statusEl.textContent = total === 0
         ? 'No matches'
         : `${total.toLocaleString()} match${total === 1 ? '' : 'es'}${total > MAX_DISPLAY ? ` — showing first ${MAX_DISPLAY}` : ''}`;
+      countEl.textContent = '';
 
       wordsEl.innerHTML = '';
       const frag = document.createDocumentFragment();
@@ -458,7 +458,22 @@
       runFilter();
     });
 
-    lettersInput.addEventListener('input', runFilter);
+    lettersInput.addEventListener('input', () => {
+      const rawLetters = lettersInput.value.trim().toLowerCase().replace(/[^a-z]/g, '');
+      const letterCount = rawLetters.length;
+
+      if (letterCount > 0) {
+        lengthSlider.max = letterCount;
+        lengthSlider.value = letterCount;
+        lengthDisplay.textContent = letterCount;
+      } else {
+        lengthSlider.max = 30;
+      }
+
+      posFilters.querySelectorAll('.pos-input').forEach(el => { el.value = ''; });
+      buildPositionInputs(+lengthSlider.value);
+      runFilter();
+    });
   </script>
 </body>
 </html>
