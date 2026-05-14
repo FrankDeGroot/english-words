@@ -30,7 +30,7 @@ jobs:
       - name: Prepare site
         run: |
           mkdir site
-          cp index.html words_alpha.txt site/
+          cp index.html word_trails.txt site/
 
       - uses: actions/configure-pages@v5
 
