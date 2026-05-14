@@ -5,7 +5,7 @@ on:
     branches: [master]
     paths:
       - index.html
-      - words_alpha.txt
+      - word_trails.txt
 
   workflow_dispatch:
 
