@@ -361,6 +361,9 @@
         inp.className = 'pos-input';
         inp.dataset.index = i;
         inp.value = prev[i] || '';
+        inp.autocapitalize = 'none';
+        inp.autocomplete = 'off';
+        inp.spellcheck = false;
         if (inp.value) inp.classList.add('filled');
 
         inp.addEventListener('focus', () => inp.select());
