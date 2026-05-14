@@ -5,7 +5,7 @@ from typing import Optional
 
 
 def load_words() -> Iterator[str]:
-    with open('words_alpha.txt') as word_file:
+    with open('word_trails.txt') as word_file:
         for line in word_file:
             yield line.strip()
 
