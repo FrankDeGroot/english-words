@@ -7,29 +7,133 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    :root {
+      --bg-primary: #f4f4f6;
+      --bg-secondary: #fff;
+      --bg-tertiary: #fafafa;
+      --bg-accent: #f0f0ff;
+      --bg-filled: #ede9fe;
+      --text-primary: #222;
+      --text-secondary: #1a1a2e;
+      --text-muted: #888;
+      --text-light: #666;
+      --text-tag: #333;
+      --text-filled: #4338ca;
+      --border-light: #ddd;
+      --border-neutral: #e0e0e8;
+      --border-accent: #a5b4fc;
+      --border-index: #aaa;
+      --accent-color: #6366f1;
+      --shadow: rgba(0,0,0,.08);
+      --transition: .15s;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1a1a2e;
+        --bg-secondary: #2d2d3d;
+        --bg-tertiary: #3a3a4a;
+        --bg-accent: #4a3f7f;
+        --bg-filled: #5a4f9f;
+        --text-primary: #e8e8f0;
+        --text-secondary: #f0f0f8;
+        --text-muted: #aaa;
+        --text-light: #999;
+        --text-tag: #ddd;
+        --text-filled: #c4b5fd;
+        --border-light: #555;
+        --border-neutral: #4a4a5a;
+        --border-accent: #7c3aed;
+        --border-index: #666;
+        --shadow: rgba(0,0,0,.3);
+      }
+    }
+
+    /* Forced dark — overrides media query */
+    html.dark-mode {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #2d2d3d;
+      --bg-tertiary: #3a3a4a;
+      --bg-accent: #4a3f7f;
+      --bg-filled: #5a4f9f;
+      --text-primary: #e8e8f0;
+      --text-secondary: #f0f0f8;
+      --text-muted: #aaa;
+      --text-light: #999;
+      --text-tag: #ddd;
+      --text-filled: #c4b5fd;
+      --border-light: #555;
+      --border-neutral: #4a4a5a;
+      --border-accent: #7c3aed;
+      --border-index: #666;
+      --shadow: rgba(0,0,0,.3);
+    }
+
+    /* Forced light — overrides media query */
+    html.light-mode {
+      --bg-primary: #f4f4f6;
+      --bg-secondary: #fff;
+      --bg-tertiary: #fafafa;
+      --bg-accent: #f0f0ff;
+      --bg-filled: #ede9fe;
+      --text-primary: #222;
+      --text-secondary: #1a1a2e;
+      --text-muted: #888;
+      --text-light: #666;
+      --text-tag: #333;
+      --text-filled: #4338ca;
+      --border-light: #ddd;
+      --border-neutral: #e0e0e8;
+      --border-accent: #a5b4fc;
+      --border-index: #aaa;
+      --shadow: rgba(0,0,0,.08);
+    }
+
     body {
       font-family: system-ui, sans-serif;
-      background: #f4f4f6;
-      color: #222;
+      background: var(--bg-primary);
+      color: var(--text-primary);
       min-height: 100vh;
       padding: 2rem 1rem;
+      transition: background .3s, color .3s;
     }
+
+    .theme-toggle {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: .5rem .75rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      transition: background .3s, border-color .3s;
+      box-shadow: 0 2px 4px var(--shadow);
+    }
+    .theme-toggle:hover { background: var(--bg-accent); }
 
     h1 {
       font-size: 1.6rem;
       margin-bottom: 1.5rem;
-      color: #1a1a2e;
+      color: var(--text-secondary);
     }
 
     .controls {
-      background: #fff;
+      background: var(--bg-secondary);
       border-radius: 12px;
       padding: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      box-shadow: 0 2px 8px var(--shadow);
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
       max-width: 800px;
+      transition: background .3s;
     }
 
     .field label {
@@ -38,21 +142,23 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: .05em;
-      color: #666;
+      color: var(--text-light);
       margin-bottom: .4rem;
     }
 
     #letters-input {
       font-size: 1.1rem;
       padding: .45rem .7rem;
-      border: 2px solid #ddd;
+      border: 2px solid var(--border-light);
       border-radius: 8px;
       width: 100%;
       max-width: 320px;
       outline: none;
-      transition: border-color .15s;
+      transition: border-color var(--transition), background .3s, color .3s;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
     }
-    #letters-input:focus { border-color: #6366f1; }
+    #letters-input:focus { border-color: var(--accent-color); }
 
     .slider-row {
       display: flex;
@@ -63,14 +169,14 @@
     #length-slider {
       flex: 1;
       max-width: 280px;
-      accent-color: #6366f1;
+      accent-color: var(--accent-color);
       cursor: pointer;
     }
 
     #length-display {
       font-size: 1.3rem;
       font-weight: 700;
-      color: #6366f1;
+      color: var(--accent-color);
       min-width: 2ch;
       text-align: center;
     }
@@ -87,21 +193,22 @@
       text-align: center;
       font-size: 1.1rem;
       font-weight: 600;
-      border: 2px solid #ddd;
+      border: 2px solid var(--border-light);
       border-radius: 6px;
       outline: none;
       text-transform: lowercase;
-      transition: border-color .15s, background .15s;
-      background: #fafafa;
+      transition: border-color var(--transition), background var(--transition), color .3s;
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
     }
-    .pos-input:focus { border-color: #6366f1; background: #f0f0ff; }
-    .pos-input.filled { border-color: #6366f1; background: #ede9fe; color: #4338ca; }
+    .pos-input:focus { border-color: var(--accent-color); background: var(--bg-accent); }
+    .pos-input.filled { border-color: var(--accent-color); background: var(--bg-filled); color: var(--text-filled); }
 
     .pos-index {
       width: 2.2rem;
       text-align: center;
       font-size: .65rem;
-      color: #aaa;
+      color: var(--border-index);
       margin-top: .15rem;
     }
 
@@ -113,7 +220,7 @@
 
     #status {
       font-size: .85rem;
-      color: #888;
+      color: var(--text-muted);
       min-height: 1.2em;
     }
 
@@ -124,7 +231,7 @@
 
     #results-count {
       font-size: .85rem;
-      color: #888;
+      color: var(--text-muted);
       margin-bottom: .75rem;
     }
 
@@ -135,19 +242,20 @@
     }
 
     .word-tag {
-      background: #fff;
-      border: 1px solid #e0e0e8;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-neutral);
       border-radius: 6px;
       padding: .25rem .6rem;
       font-size: .95rem;
       font-family: 'Courier New', monospace;
-      color: #333;
-      transition: background .1s;
+      color: var(--text-tag);
+      transition: background .1s, border-color .1s;
     }
-    .word-tag:hover { background: #ede9fe; border-color: #a5b4fc; }
+    .word-tag:hover { background: var(--bg-accent); border-color: var(--border-accent); }
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
   <h1>Word Finder</h1>
 
   <div class="controls">
@@ -178,6 +286,41 @@
   </div>
 
   <script>
+    // ── Theme toggle logic ──────────────────────────────────────────
+    const themeToggle = document.getElementById('theme-toggle');
+    const html = document.documentElement;
+    const THEME_KEY = 'word-finder-theme';
+
+    const THEMES = [
+      { key: 'system', icon: '🌓', title: 'System theme — switch to dark' },
+      { key: 'dark',   icon: '🌙', title: 'Dark mode — switch to light' },
+      { key: 'light',  icon: '☀️', title: 'Light mode — switch to system' },
+    ];
+
+    function applyTheme(key) {
+      html.classList.toggle('dark-mode',  key === 'dark');
+      html.classList.toggle('light-mode', key === 'light');
+      html.style.colorScheme = key === 'dark' ? 'dark' : key === 'light' ? 'light' : 'light dark';
+      const t = THEMES.find(t => t.key === key);
+      themeToggle.textContent = t.icon;
+      themeToggle.title = t.title;
+      themeToggle.setAttribute('aria-label', t.title);
+    }
+
+    function initTheme() {
+      applyTheme(localStorage.getItem(THEME_KEY) || 'system');
+    }
+
+    themeToggle.addEventListener('click', () => {
+      const current = localStorage.getItem(THEME_KEY) || 'system';
+      const idx = THEMES.findIndex(t => t.key === current);
+      const next = THEMES[(idx + 1) % THEMES.length].key;
+      localStorage.setItem(THEME_KEY, next);
+      applyTheme(next);
+    });
+
+    initTheme();
+
     const MAX_DISPLAY = 500;
 
     let allWords = [];
