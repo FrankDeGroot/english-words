@@ -315,7 +315,20 @@
       runFilter();
     });
 
-    lettersInput.addEventListener('input', runFilter);
+    lettersInput.addEventListener('input', () => {
+      const len = lettersInput.value.trim().toLowerCase().replace(/[^a-z]/g, '').length;
+      if (len > 0) {
+        lengthSlider.max = len;
+        lengthSlider.value = len;
+        lengthDisplay.textContent = len;
+      }
+      posFilters.querySelectorAll('.pos-input').forEach(el => {
+        el.value = '';
+        el.classList.remove('filled');
+      });
+      buildPositionInputs(+lengthSlider.value);
+      runFilter();
+    });
   </script>
 </body>
 </html>
