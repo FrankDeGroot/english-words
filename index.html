@@ -365,7 +365,9 @@
 
         inp.addEventListener('focus', () => inp.select());
         inp.addEventListener('input', () => {
-          inp.value = inp.value.toLowerCase().replace(/[^a-z]/g, '').slice(-1);
+          const rawLetters = lettersInput.value.trim().toLowerCase().replace(/[^a-z]/g, '');
+          const ch = inp.value.toLowerCase().replace(/[^a-z]/g, '').slice(-1);
+          inp.value = (ch && rawLetters && !rawLetters.includes(ch)) ? '' : ch;
           inp.classList.toggle('filled', inp.value !== '');
           runFilter();
           // auto-advance
