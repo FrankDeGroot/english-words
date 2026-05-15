@@ -407,6 +407,14 @@
       }
     }
 
+    function resetPositionFilters(n) {
+      posFilters.querySelectorAll('.pos-input').forEach(el => {
+        el.value = '';
+        el.classList.remove('filled');
+      });
+      buildPositionInputs(n);
+    }
+
     // ── Filter logic ────────────────────────────────────────────────
     function letterCounts(str) {
       const c = {};
@@ -478,11 +486,7 @@
       const n = +lengthSlider.value;
       lengthDisplay.textContent = n;
       dimmedWords.clear();
-      posFilters.querySelectorAll('.pos-input').forEach(el => {
-        el.value = '';
-        el.classList.remove('filled');
-      });
-      buildPositionInputs(n);
+      resetPositionFilters(n);
       runFilter();
     });
 
@@ -500,11 +504,7 @@
       }
 
       dimmedWords.clear();
-      posFilters.querySelectorAll('.pos-input').forEach(el => {
-        el.value = '';
-        el.classList.remove('filled');
-      });
-      buildPositionInputs(+lengthSlider.value);
+      resetPositionFilters(+lengthSlider.value);
       runFilter();
     });
   </script>
