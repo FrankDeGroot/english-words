@@ -478,6 +478,10 @@
       const n = +lengthSlider.value;
       lengthDisplay.textContent = n;
       dimmedWords.clear();
+      posFilters.querySelectorAll('.pos-input').forEach(el => {
+        el.value = '';
+        el.classList.remove('filled');
+      });
       buildPositionInputs(n);
       runFilter();
     });
