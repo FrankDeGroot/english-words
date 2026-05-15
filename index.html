@@ -515,6 +515,10 @@
 
     lettersInput.value = localStorage.getItem(LETTERS_KEY) || '';
 
+    lettersInput.addEventListener('focus', () => {
+      lettersInput.select();
+    });
+
     lettersInput.addEventListener('input', () => {
       localStorage.setItem(LETTERS_KEY, lettersInput.value);
       const rawLetters = lettersInput.value.trim().toLowerCase().replace(/[^a-z]/g, '');
