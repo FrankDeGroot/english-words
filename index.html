@@ -487,9 +487,10 @@
       const letterCount = rawLetters.length;
 
       if (letterCount > 0) {
-        lengthSlider.max = Math.max(letterCount, 3);
-        lengthSlider.value = 3;
-        lengthDisplay.textContent = 3;
+        const max = Math.max(letterCount, 3);
+        lengthSlider.max = max;
+        lengthSlider.value = max;
+        lengthDisplay.textContent = max;
       } else {
         lengthSlider.max = 30;
       }
